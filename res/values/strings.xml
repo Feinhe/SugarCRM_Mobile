@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">SugarCRM_Mobile</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="app_name">SugarCRM Mobile</string>
+	<string name="logo">Sugar Talk</string>
+	<string name="log_in">Log in</string>
     <string name="action_settings">Settings</string>
-
+	
+    <string name="user">user:</string>
+    <string name="password">pass:</string>
+    <string name="url">url:</string>
+    
+    <string name="error_empty_field">This field is requared!</string>
+    
 </resources>

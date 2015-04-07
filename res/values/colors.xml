@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="sysOrange">#F09422</color>
+	<color name="sysBGLightFGray">#E0E0E0</color>
+	<color name="sysDarkBlue">#192541</color>
+	<color name="sysBlue">#3B5898</color>
+	<color name="sysLightSylverBlue">#A0BBD2</color>
+	<color name="sysDarkSylverBlue">#95ADC4</color>
+</resources>
