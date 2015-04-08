@@ -35,15 +35,15 @@ public class LoginModel
 		}
 	}
 
-	public void registerLoginObserver(final LoginObserver LoginObserver) {
-		mObservable.registerObserver(LoginObserver);
+	public void registerLoginObserver(final LoginObserver observer) {
+		mObservable.registerObserver(observer);
 		if (mIsWorking) {
-			LoginObserver.onLoginStarted(this);
+			observer.onLoginStarted(this);
 		}
 	}
 
-	public void unregisterLoginObserver(final LoginObserver LoginObserver) {
-		mObservable.unregisterObserver(LoginObserver);
+	public void unregisterLoginObserver(final LoginObserver observer) {
+		mObservable.unregisterObserver(observer);
 	}
 
 	private class LoginTask extends AsyncTask<Void, Void, Boolean> {
@@ -75,29 +75,29 @@ public class LoginModel
 	}
 
 	public interface LoginObserver {
-		void onLoginStarted(LoginModel LogInModel);
+		void onLoginStarted(LoginModel model);
 
-		void onLoginSucceeded(LoginModel LogInModel);
+		void onLoginSucceeded(LoginModel model);
 
-		void onLoginFailed(LoginModel LogInModel);
+		void onLoginFailed(LoginModel model);
 	}
 
 	private class LoginObservable extends Observable<LoginObserver> {
 		public void notifyStarted() {
-			for (final LoginObserver LoginObserver : mObservers) {
-				LoginObserver.onLoginStarted(LoginModel.this);
+			for (final LoginObserver observer : mObservers) {
+				observer.onLoginStarted(LoginModel.this);
 			}
 		}
 
 		public void notifySucceeded() {
-			for (final LoginObserver LoginObserver : mObservers) {
-				LoginObserver.onLoginSucceeded(LoginModel.this);
+			for (final LoginObserver observer : mObservers) {
+				observer.onLoginSucceeded(LoginModel.this);
 			}
 		}
 
 		public void notifyFailed() {
-			for (final LoginObserver LoginObserver : mObservers) {
-				LoginObserver.onLoginFailed(LoginModel.this);
+			for (final LoginObserver observer : mObservers) {
+				observer.onLoginFailed(LoginModel.this);
 			}
 		}
 	}

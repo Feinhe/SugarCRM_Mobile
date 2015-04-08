@@ -104,20 +104,20 @@ public class LoginActivity extends ActionBarActivity implements LoginModel.Login
 	}
 
 	@Override
-	public void onLoginStarted(final LoginModel LoginModel) {
+	public void onLoginStarted(final LoginModel model) {
 		Log.i(TAG, "onLoginStarted");
 		showProgress(true);
 	}
 
 	@Override
-	public void onLoginSucceeded(final LoginModel LoginModel) {
+	public void onLoginSucceeded(final LoginModel model) {
 		Log.i(TAG, "onLoginSucceeded");
 		finish();
 		//TODO launch next activity
 	}
 
 	@Override
-	public void onLoginFailed(final LoginModel LoginModel) {
+	public void onLoginFailed(final LoginModel model) {
 		Log.i(TAG, "onLoginFailed");
 		showProgress(false);
 		Toast.makeText(this, "Login error", Toast.LENGTH_SHORT).show();

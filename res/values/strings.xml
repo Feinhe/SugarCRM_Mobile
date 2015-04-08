@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="app_name">SugarCRM Mobile</string>
 	<string name="logo">Sugar Talk</string>
 	<string name="log_in">Log in</string>
@@ -11,5 +10,4 @@
     <string name="url">url:</string>
     
     <string name="error_empty_field">This field is requared!</string>
-    
 </resources>
