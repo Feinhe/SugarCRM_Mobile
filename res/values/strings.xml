@@ -1,13 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <string name="app_name">SugarCRM Mobile</string>
-	<string name="logo">Sugar Talk</string>
-	<string name="log_in">Log in</string>
+    <string name="logo">Sugar Talk</string>
+    <string name="log_in">Log in</string>
     <string name="action_settings">Settings</string>
-	
     <string name="user">user:</string>
     <string name="password">pass:</string>
     <string name="url">url:</string>
     
+    <string name="sugar_static_url_part">/service/v4/rest.php?</string>
+    
+    <string name="title_activity_home">HomeActivity</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+	
+    <!-- DFAULT JSON MEMBER VARIABLE NAMES -->
+    <string name="jmvn_module_name">module_name</string>
+    <string name="jmvn_module_key">module_key</string>
+    <string name="jmvn_module_label">module_label</string>
+    <string name="jmvn_modules">modules</string>
+    
+    <string name="jmvn_entry_list">entry_list</string>
+    <string name="jmvn_name_value_list">name_value_list</string>
+    <string name="jmvn_id">id</string>
+    <string name="jmvn_name">name</string>
+    <string name="jmvn_value">value</string>
+    <string name="jmvn_description">description</string>
+    <string name="jmvn_date_entered">date_entered</string>
+    
+    
+    <!-- EXCLUDE MODULES FROM REPRESENTATION -->
+    <string-array name="exclude_modules">
+        <item>sugartalk_SMS</item>
+        <item>Calendar</item>
+        <item>Home</item>
+        <item>Campaigns</item>
+        <item>RealtyTemplates</item>
+        <item>Emails</item>
+        <item>ZuckerReports</item>
+    </string-array>
+    
+    
+    
+    <!-- ERRORS -->
+    <string name="error_unknown">Unknown error!</string>
+    <string name="error_connex">Connection error!</string>
+    <string name="error_parseex">Data parse error!</string>
     <string name="error_empty_field">This field is requared!</string>
+    
+    
+    
+    <!-- DATA BASE STRING RESOURCES -->
+    <string name="db_name">sugarcrm.temp.db</string>
+    <string name="db_requests_table">RequestsTable</string>
+
+    <string-array name="db_requests_table_columns">
+        <item>_id</item>
+        <item>params</item>
+        <item>requestResult</item>
+    </string-array>
+    
+    
+    
 </resources>

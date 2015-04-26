@@ -1,5 +1,8 @@
 package com.sugarcrm.android.login;
 
+import com.sugarcrm.android.activity.HomeActivity;
+import com.sugarcrm.android.database.DataBaseController;
+import com.sugarcrm.android.fragment.FragmentModelBox;
 import com.sugarcrm.android.R;
 import com.sugarcrm.android.R.layout;
 
@@ -9,26 +12,28 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 
 public class LoginActivity extends ActionBarActivity implements LoginModel.LoginObserver
 {
 	private static final String TAG = "LoginActivity";
-	private static final String TAG_WORKER = "TAG_WORKER";
+	public static final String TAG_BOX = "TAG_BOX";
 	
 	private EditText mUser;
 	private EditText mPass;
 	private EditText mUrl;
 	private View mLogin;
 	private View mProgress;
-	
+
 	private LoginModel mLoginModel;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_login);
-		
+
 		mUser = (EditText) findViewById(R.id.edittext_user);
 		mPass = (EditText) findViewById(R.id.edittext_password);
 		mUrl = (EditText) findViewById(R.id.edittext_url);
@@ -42,22 +47,32 @@ public class LoginActivity extends ActionBarActivity implements LoginModel.Login
 			}
 		});
 		
-		final LoginFragmentBox retainedWorkerFragment =
-				(LoginFragmentBox) getSupportFragmentManager().findFragmentByTag(TAG_WORKER);
+		retainModel();
+		
+		mLoginModel.registerLoginObserver(this);
+		
+		new Handler().post(new Runnable() {
+			public void run() {
+				DataBaseController.getInstance().deleteTempDataTable();
+			}
+		});
+	}
+	
+	private void retainModel() {
+		final FragmentModelBox retainedWorkerFragment =
+				(FragmentModelBox) getSupportFragmentManager().findFragmentByTag(TAG_BOX);
 
 		if (retainedWorkerFragment != null) {
-			mLoginModel = retainedWorkerFragment.getLoginModel();
+			mLoginModel = (LoginModel) retainedWorkerFragment.getModel();
 		} else {
-			final LoginFragmentBox workerFragment = new LoginFragmentBox();
+			final FragmentModelBox workerFragment = FragmentModelBox.newInstance(new LoginModel());
 			
 			getSupportFragmentManager().beginTransaction()
-					.add(workerFragment, TAG_WORKER)
+					.add(workerFragment, TAG_BOX)
 					.commit();
 
-			mLoginModel = workerFragment.getLoginModel();
+			mLoginModel = (LoginModel) workerFragment.getModel();
 		}
-
-		mLoginModel.registerLoginObserver(this);
 	}
 
 	@Override
@@ -77,9 +92,13 @@ public class LoginActivity extends ActionBarActivity implements LoginModel.Login
 		mPass.setError(null);
 		mUrl.setError(null);
 		
-		final String user = mUser.getText().toString();
-		final String pass = mPass.getText().toString();
-		final String url = mUrl.getText().toString();
+		String user = mUser.getText().toString();
+		String pass = mPass.getText().toString();
+		String url = mUrl.getText().toString();
+		
+		user = "admin";
+		pass = "sugar_cal";
+		url = "http://realty-beta.crmprof-service.com";
 		
 		boolean cancel = false;
 		View focusView = null;
@@ -97,7 +116,7 @@ public class LoginActivity extends ActionBarActivity implements LoginModel.Login
 			mUser.setError(getString(R.string.error_empty_field));
 			focusView = mUser;
 			cancel = true;
-		} 
+		}
 		
 		if (cancel) focusView.requestFocus();
 		else mLoginModel.login(user, pass, url);
@@ -112,15 +131,19 @@ public class LoginActivity extends ActionBarActivity implements LoginModel.Login
 	@Override
 	public void onLoginSucceeded(final LoginModel model) {
 		Log.i(TAG, "onLoginSucceeded");
+		Toast.makeText(this, "Logined in!", Toast.LENGTH_SHORT).show();
 		finish();
+		Intent i = new Intent(this, HomeActivity.class);
+		startActivity(i);
 		//TODO launch next activity
 	}
 
 	@Override
 	public void onLoginFailed(final LoginModel model) {
-		Log.i(TAG, "onLoginFailed");
+		Log.e(TAG, "onLoginFailed");
 		showProgress(false);
-		Toast.makeText(this, "Login error", Toast.LENGTH_SHORT).show();
+		Toast.makeText(this, mLoginModel.mErrorMsg, Toast.LENGTH_SHORT).show();
+		mLoginModel.mErrorMsg = null;
 	}
 
 	private void showProgress(final boolean show) {

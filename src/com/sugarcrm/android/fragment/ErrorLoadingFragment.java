@@ -10,8 +10,10 @@ import android.view.ViewGroup;
 
 public class ErrorLoadingFragment extends Fragment
 {
+	public static final String TAG = "ErrorLoadingFragment";
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		return inflater.inflate(R.layout.fragment_error_loading, container);
+		return inflater.inflate(R.layout.fragment_error_loading, container, false);
 	}
 }

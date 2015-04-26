@@ -8,23 +8,14 @@ import android.util.Log;
 
 public abstract class RequestModel 
 {
-	private static final String TAG = "DataRequestModel";
-	
-	public static final int MODULE_DATA = 2; 			//доступные модули
-	public static final int UPCOMMING_ACTIVITES = 4; 	//грядущие мероприятия
-	public static final int ENTRY_LIST = 6; 			//разделенные списки(по пагинации) каждого модуля
-	public static final int SEARCH_ENTRY_LIST = 8; 		//возвращаемый при поиске (находим по строке запроса - 2map)
-	public static final int HOME_ENTRY_LIST = 10;		//ентрилст для домашней странички
-	public static final int CARD_FORM_ENTRY = 12;		//инфа в карточке
-	public static final int MODULES_FIELDS = 14; 		//поля каждого модуля
-	public static final int MODULES_LAYOUT = 16; 		//лейаут каждого модуля
-	public static final int LAYOUT_FIELDS = 18; 		//поля лейаута каждого модуля(для удобной выборки)
-	public static final int LANGUAGE_DEFINITION = 20; 	//локализация полей
+	protected static final String TAG = "RequestModel";
 	
 	public static final int RESULT_CODE_OK = 0;
 	
-	private final RequestObservable mObservables = new RequestObservable();
-	private final TaskObservable mTaskObservables = new TaskObservable();
+	private boolean mIsWorking; 
+	
+	protected final RequestObservable mObservables = new RequestObservable();
+	protected final TaskObservable mTaskObservables = new TaskObservable();
 	
 	public RequestModel() {
 		Log.i(TAG, "new Instance");
@@ -32,73 +23,95 @@ public abstract class RequestModel
 	
 	public void registerRequestObserver(final ContentRequestObserver observer) {
 		mObservables.registerObserver(observer);
-		if(isContentDownloaded()) {
-			mObservables.notifyContentDownloaded();
-		}
+		provideCurrentModelState();
 	}
 	
 	public void unregisterRequestObserver(final ContentRequestObserver observer) {
 		mObservables.unregisterObserver(observer);
 	}
+	
+	protected void provideCurrentModelState() {
+		if(mIsWorking) {
+			mObservables.notifyStarted();
+		} 
+		
+		if(isContentDownloaded()) {
+			mObservables.notifyContentDownloaded();
+		}
+	}
 
 	public final void sendRequest(int requestCode, ParameterBundle params) {
-		mObservables.notifyStarted(requestCode);
+		if(mIsWorking) {
+			return;
+		}
+		
+		mIsWorking = true;
+		mObservables.notifyStarted();
+		Log.i(TAG, "started");
 		startRequest(requestCode, params);
 	}
 	
-	abstract void startRequest(int requestCode, ParameterBundle params);
+	abstract protected void startRequest(int requestCode, ParameterBundle params);
 	
 	
 	public final void stopTaskInRequest(int requestCode) {
 		mTaskObservables.stopTask(requestCode);
+		if(mTaskObservables.isEmpty()) {
+			mIsWorking = false;
+		}
 	}
 	
 	public final void stopRequest() {
+		Log.i(TAG, "stopped");
+		mIsWorking = false;
 		mTaskObservables.stopAllTasks();
 	}
 	
-	public boolean isContentDownloaded() {
-		return true;
-	}
+	abstract boolean isContentDownloaded();
 	
 	public interface ContentRequestObserver {
-		void onRequestStarted(int requestCode, RequestModel model);
+		void onRequestStarted(RequestModel model);
 		
-		void onRequestSucceeded(int requestCode, RequestModel model);
+		void onTaskSucceeded(int requestCode, RequestModel model);
 		
-		void onRequestFailed(int requestCode, RequestModel model);
+		void onRequestFailed(int errStringId, int requestCode, RequestModel model);
 		
 		void onAsyncTaskCompletion(int resultCode, int requestCode, RequestModel model);
 		
 		void onContentDownloaded(RequestModel model);
 	}
 	
-	abstract Integer doSplittBackground(int requestCode, ParameterBundle params);
+	interface SplittExecuter {
+		Integer doInBackground(int requestCode, ParameterBundle params);
+	}
 	
-	protected void onPostExecute(int requestCode, int resultCode) { }
+	protected void onPostExecute(int requestCode, ParameterBundle params, int resultCode) { }
 	
-	private class RequestTask extends AsyncTask<Void, Void, Integer> 
+	class RequestTask extends AsyncTask<Void, Void, Integer> 
 	{
 		private int mRequestCode;
 		private ParameterBundle mParams;
+		private SplittExecuter mSplittExec;
 		
 		public int getRequestCode() {
 			return mRequestCode;
 		}
 		
-		public RequestTask(int requestCode, ParameterBundle params) {
+		public RequestTask(int requestCode, ParameterBundle params, SplittExecuter executer) {
 			mRequestCode = requestCode;
 			mParams = params;
+			mSplittExec = executer;
 		}
 		
 		@Override
 		protected void onPreExecute() {
+			Log.d(TAG, "task started, request code: "+mRequestCode);
 			mTaskObservables.registerObserver(this);
 		}
 
 		@Override
 		protected Integer doInBackground(Void... params) {
-			Integer resultCode = RequestModel.this.doSplittBackground(mRequestCode, mParams);
+			Integer resultCode = mSplittExec.doInBackground(mRequestCode, mParams);
 			mObservables.notifyAsyncTaskCompletion(resultCode, mRequestCode);
 			return resultCode;
 		}
@@ -106,19 +119,23 @@ public abstract class RequestModel
 		@Override
 		protected void onPostExecute(Integer resultCode) {
 			mTaskObservables.unregisterObserver(this);
+			Log.d(TAG, "task finished, request code: "+mRequestCode+", result code: "+resultCode);
+			if(mTaskObservables.isEmpty()) {
+				mIsWorking = false;
+			}
 			
 			if (resultCode == RESULT_CODE_OK) {
 				mObservables.notifySucceeded(mRequestCode);
 				if(isContentDownloaded()) {
 					mObservables.notifyContentDownloaded();
-				}
+				} 
 			} else {
-				mObservables.notifyFailed(mRequestCode);
-			} RequestModel.this.onPostExecute(mRequestCode, resultCode);
+				mObservables.notifyFailed(mRequestCode, resultCode);
+			} RequestModel.this.onPostExecute(mRequestCode, mParams, resultCode);
 		}
 	}
 	
-	private class TaskObservable extends Observable<RequestTask> 
+	protected class TaskObservable extends Observable<RequestTask> 
 	{
 		public void stopTask(int requestCode) {
 			for (final RequestTask task : mObservers) {
@@ -134,25 +151,29 @@ public abstract class RequestModel
 				task.cancel(true);
 			} unregisterAll();
 		}
+		
+		public boolean isEmpty() {
+			return mObservers.isEmpty();
+		}
 	}
 	
-	private class RequestObservable extends Observable<ContentRequestObserver> 
+	protected class RequestObservable extends Observable<ContentRequestObserver> 
 	{
-		public void notifyStarted(int requestCode) {
+		public void notifyStarted() {
 			for (final ContentRequestObserver observer : mObservers) {
-				observer.onRequestStarted(requestCode, RequestModel.this);
+				observer.onRequestStarted(RequestModel.this);
 			}
 		}
 
 		public void notifySucceeded(int requestCode) {
 			for (final ContentRequestObserver observer : mObservers) {
-				observer.onRequestSucceeded(requestCode, RequestModel.this);
+				observer.onTaskSucceeded(requestCode, RequestModel.this);
 			}
 		}
 
-		public void notifyFailed(int requestCode) {
+		public void notifyFailed(int requestCode, int resultCode) {
 			for (final ContentRequestObserver observer : mObservers) {
-				observer.onRequestFailed(requestCode, RequestModel.this);
+				observer.onRequestFailed(resultCode, requestCode, RequestModel.this);
 			}
 		}
 		

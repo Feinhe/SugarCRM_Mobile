@@ -3,6 +3,9 @@ package com.sugarcrm.android.http;
 import java.util.ArrayList;
 import java.util.Map;
 
+import com.google.gson.JsonElement;
+import com.sugarcrm.android.app.SugarApp;
+
 public class ParameterBundle 
 {
 	public String session_id;
@@ -12,6 +15,7 @@ public class ParameterBundle
 	public String query;
 	public String order_by;
 	public String search_string;
+	public String filter;
 	
 	public Integer offset;
 	public Integer max_results;
@@ -28,4 +32,12 @@ public class ParameterBundle
 	public Boolean acl_check;
 	public Boolean unified_search_only;
 	public Boolean md5;
+	
+	public JsonElement serializeJSON() {
+		return SugarApp.getGson().toJsonTree(this);
+	}
+	
+	public static ParameterBundle deSerializeJSON(String jsonStr) {
+		return SugarApp.getGson().fromJson(jsonStr, ParameterBundle.class); 
+	}
 }

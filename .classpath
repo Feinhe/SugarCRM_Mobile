@@ -5,8 +5,13 @@
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
-	<classpathentry kind="lib" path="libs/httpclient-4.4.1.jar"/>
-	<classpathentry kind="lib" path="libs/httpcore-4.4.1.jar"/>
-	<classpathentry kind="lib" path="libs/httpmime-4.4.1.jar"/>
+	<classpathentry kind="lib" path="libs/gson-2.3.1.jar" sourcepath="libs/src/gson-2.3.1-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:platform:/resource/SugarCRM_Mobile/libs/docs/gson-2.3.1-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="libs/httpclient-4.3.2.jar"/>
+	<classpathentry kind="lib" path="libs/httpcore-4.3.1.jar"/>
+	<classpathentry kind="lib" path="libs/httpmime-4.3.2.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
