@@ -18,7 +18,7 @@ import android.support.v7.app.ActionBarActivity;
 
 public abstract class ActivityWithModelBase extends ActionBarActivity implements ContentRequestObserver
 {
-	private static final String TAG_BOX = "TAG_BOX";
+	public static final String TAG_BOX = "TAG_BOX";
 	
 	protected RequestModel mRequestModel;
 	
@@ -26,9 +26,10 @@ public abstract class ActivityWithModelBase extends ActionBarActivity implements
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		retainModel();
+		initilizeUI(savedInstanceState);
 		mRequestModel.registerRequestObserver(this);
 	}
-	
+
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
@@ -36,6 +37,8 @@ public abstract class ActivityWithModelBase extends ActionBarActivity implements
 		if (isFinishing()) {
 			mRequestModel.stopRequest();
 		}
+		
+		mRequestModel = null;
 	}
 	
 	private final void retainModel() {
@@ -57,16 +60,18 @@ public abstract class ActivityWithModelBase extends ActionBarActivity implements
 		mRequestModel.sendRequest(requestCode, params);
 	}
 	
-	/* ABSTRUCT */
+	/* ABSTRACT */
 	
+	abstract protected void initilizeUI(Bundle savedInstanceState);
 	abstract protected RequestModel createModel();
+	abstract protected int getRootViewId();
 	abstract public void resolveDownloadedContent(RequestModel model);
 	
 	/*MODEL CALLBACKS*/
 	
 	@Override
 	public void onRequestStarted(RequestModel model) {
-		addLoadingInfoFragment(this, R.id.activity_home_root_frame);
+		addLoadingInfoFragment(getSupportFragmentManager(), getRootViewId());
 	}
 
 	@Override
@@ -74,8 +79,8 @@ public abstract class ActivityWithModelBase extends ActionBarActivity implements
 
 	@Override
 	public void onRequestFailed(int errStringId, int requestCode, RequestModel model) {
-		removeFragmentByTag(this, LoadingFragment.TAG);
-		addErrorInfoFragment(this, R.id.activity_home_root_frame);
+		removeFragmentByTag(getSupportFragmentManager(), LoadingFragment.TAG);
+		addErrorInfoFragment(getSupportFragmentManager(), getRootViewId());
 	}
 
 	@Override
@@ -83,7 +88,7 @@ public abstract class ActivityWithModelBase extends ActionBarActivity implements
 
 	@Override
 	public void onContentDownloaded(RequestModel model) {
-		removeFragmentByTag(this, LoadingFragment.TAG);
+		removeFragmentByTag(getSupportFragmentManager(), LoadingFragment.TAG);
 		resolveDownloadedContent(model);
 	}
 }

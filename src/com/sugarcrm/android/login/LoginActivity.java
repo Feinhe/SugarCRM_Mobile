@@ -96,9 +96,7 @@ public class LoginActivity extends ActionBarActivity implements LoginModel.Login
 		String pass = mPass.getText().toString();
 		String url = mUrl.getText().toString();
 		
-		user = "admin";
-		pass = "sugar_cal";
-		url = "http://realty-beta.crmprof-service.com";
+
 		
 		boolean cancel = false;
 		View focusView = null;

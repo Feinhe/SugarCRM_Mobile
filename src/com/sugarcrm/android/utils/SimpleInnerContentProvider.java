@@ -30,11 +30,16 @@ public class SimpleInnerContentProvider
 				insertRequestResult(params, content); //пишем результат запроса в базу
 				content = convertResultFromJson(requestCode, (JsonElement)content); //не должен возвращать null
 			}
-		if(content == null)
-			return R.string.error_unknown;
+		if(content == null) {
+			Log.e(TAG, "error code: "+R.string.error_unknown);
+			return R.string.error_unknown; 
+		}
+		
 		} catch (JsonIOException|JsonSyntaxException|IllegalStateException e) {
+			Log.e(TAG, "error code: "+R.string.error_parseex);
 			return R.string.error_parseex;
 		} catch (IOException e) {
+			Log.e(TAG, "error code: "+R.string.error_connex);
 			return R.string.error_connex;
 		} 
 		
@@ -46,7 +51,7 @@ public class SimpleInnerContentProvider
 		Object result = converter
 				.convertToDataModel(dataType, (JsonElement) content);
 		
-		return content;
+		return result;
 	}
 	
 	private void insertRequestResult(ParameterBundle params, Object content) {

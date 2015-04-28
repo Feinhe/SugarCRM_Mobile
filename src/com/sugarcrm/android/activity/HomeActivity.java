@@ -9,6 +9,7 @@ import com.sugarcrm.android.http.ParameterBundle;
 import com.sugarcrm.android.http.SugarHttpClient;
 import com.sugarcrm.android.login.LoginActivity;
 
+import com.sugarcrm.android.model.DataModel_MODULES;
 import com.sugarcrm.android.model.HomeRequestModel;
 import com.sugarcrm.android.model.RequestModel;
 import com.sugarcrm.android.model.RequestModel.ContentRequestObserver;
@@ -48,7 +49,11 @@ public class HomeActivity extends ActivityWithModelBase implements ModuleListIte
 	}
 	
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	protected int getRootViewId() {
+		return R.id.activity_home_root_frame;
+	}
+	
+	protected void initilizeUI(Bundle savedInstanceState) {
 		setContentView(R.layout.activity_home);
 
 		mModuleListFragment = (ModuleListFragment) getSupportFragmentManager().findFragmentById(R.id.module_slide_list);
@@ -56,7 +61,6 @@ public class HomeActivity extends ActivityWithModelBase implements ModuleListIte
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 		
-		super.onCreate(savedInstanceState);
 		if(savedInstanceState == null) {
 			sendRequest(RIDs.MODULE_DATA, getParams());
 		}
@@ -72,7 +76,10 @@ public class HomeActivity extends ActivityWithModelBase implements ModuleListIte
 	@Override
 	public void resolveDownloadedContent(RequestModel model) {
 		Log.i(TAG, "resolve content");
-		mModuleListFragment.setUp(R.id.module_slide_list, (DrawerLayout) findViewById(R.id.drawer_layout));
+		mModuleListFragment.setUp(R.id.module_slide_list, 
+				(DrawerLayout) findViewById(R.id.drawer_layout),
+				((HomeRequestModel)model).getModules());
+		
 		mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 	}
 
@@ -106,7 +113,6 @@ public class HomeActivity extends ActivityWithModelBase implements ModuleListIte
 		int id = item.getItemId();
 		if (id == R.id.action_settings) {
 			return true;
-		}
-		return super.onOptionsItemSelected(item);
+		} return super.onOptionsItemSelected(item);
 	}
 }

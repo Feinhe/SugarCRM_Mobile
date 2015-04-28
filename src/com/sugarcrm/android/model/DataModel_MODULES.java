@@ -23,6 +23,15 @@ public class DataModel_MODULES implements Parcelable
 		} return null;
 	}
 	
+	public String[] createLabelArray() {
+		String[] mArr = new String[mModules.keySet().size()];
+		int i = 0;
+		for(String key : mModules.keySet()) {
+			mArr[i] = mModules.getString(key);
+			i++;
+		} return mArr;
+	}
+	
 	/* PARCELABLE */
 
 	@Override

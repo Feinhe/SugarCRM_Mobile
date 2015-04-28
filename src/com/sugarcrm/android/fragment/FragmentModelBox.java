@@ -22,6 +22,12 @@ public class FragmentModelBox extends Fragment {
 		super.onCreate(savedInstanceState);
 		setRetainInstance(true);
 	}
+	
+	@Override
+	public void onDestroy() { 
+		super.onDestroy();
+		mModel = null; //TODO спорно
+	}
 
 	public Object getModel() {
 		return mModel;

@@ -59,7 +59,8 @@ public class JsonDataModelConverter
 		JsonArray jarr = jsonData.getAsJsonObject().getAsJsonArray(jmvn_modules);
 		for(JsonElement obj : jarr) {
 			String key = obj.getAsJsonObject().get(jmvn_module_key).getAsString();
-			if(Utils.getObjectIndexInArr(excludeModules, obj) == -1) {
+			int i = Utils.getObjectIndexInArr(excludeModules, key);
+			if(i==-1) {
 				String label = obj.getAsJsonObject().get(jmvn_module_label).getAsString();
 				modules.putString(key, label);
 			}
@@ -71,15 +72,15 @@ public class JsonDataModelConverter
 	private Object convertCardFormEntry(JsonElement jsonData) {
 		String jmvn_entry_list = getString(R.string.jmvn_entry_list);
 		
-		JsonObject jobj = jsonData.getAsJsonObject();
-		JsonObject entry = jobj.getAsJsonArray(jmvn_entry_list)
+		JsonObject entry = jsonData.getAsJsonObject()
+				.getAsJsonArray(jmvn_entry_list)
 				.get(0).getAsJsonObject();
 		
 		Object result = parseEntry(entry);
 	
 		return result;
 	}
-	
+	//===================
 			private DataModel_ENTRY parseEntry(JsonObject jsonEntry) {
 				String jmvn_id = getString(R.string.jmvn_id); 
 				String jmvn_module_name = getString(R.string.jmvn_module_name); 
@@ -110,7 +111,13 @@ public class JsonDataModelConverter
 				
 				return bundle;
 			}
+	//===================
+
 	private Object convertEntryList(JsonElement jsonData) {
+		String jmvn_entry_list = getString(R.string.jmvn_entry_list);
+		
+		JsonArray jsonEntryList = jsonData.getAsJsonObject()
+				.getAsJsonArray(jmvn_entry_list);
 		
 		return jsonData;
 	}
@@ -118,6 +125,7 @@ public class JsonDataModelConverter
 	private Object convertUpcommingActivities(JsonElement jsonData) {
 		return jsonData;
 	}
+	
 	private Object convertSearchEntryList(JsonElement jsonData) {
 		return jsonData;
 	}

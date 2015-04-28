@@ -1,6 +1,7 @@
 package com.sugarcrm.android.fragment;
 
 import com.sugarcrm.android.R;
+import com.sugarcrm.android.model.DataModel_MODULES;
 
 import android.support.v7.app.ActionBarActivity;
 import android.app.Activity;
@@ -26,7 +27,6 @@ import android.widget.Toast;
 
 public class ModuleListFragment extends Fragment 
 {
-	private static final String STATE_SELECTED_POSITION = "selected_navigation_drawer_position";
 	private static final String PREF_USER_LEARNED_DRAWER = "navigation_drawer_learned";
 	
 	private ModuleListItemSelectObserver mCallbacks;
@@ -37,10 +37,11 @@ public class ModuleListFragment extends Fragment
 	private ListView mDrawerListView;
 	private View mFragmentContainerView;
 
-	private int mCurrentSelectedPosition = 0;
 	private boolean mFromSavedInstanceState;
 	private boolean mUserLearnedDrawer;
-
+	
+	private DataModel_MODULES mModules;
+	
 	public ModuleListFragment() { }
 
 	@Override
@@ -54,10 +55,8 @@ public class ModuleListFragment extends Fragment
 		mUserLearnedDrawer = sp.getBoolean(PREF_USER_LEARNED_DRAWER, false);
 
 		if (savedInstanceState != null) {
-			mCurrentSelectedPosition = savedInstanceState
-					.getInt(STATE_SELECTED_POSITION);
 			mFromSavedInstanceState = true;
-		} selectItem(mCurrentSelectedPosition);
+		}
 	}
 
 	@Override
@@ -87,15 +86,18 @@ public class ModuleListFragment extends Fragment
 	 * @param drawerLayout
 	 *            The DrawerLayout containing this fragment's UI.
 	 */
-	public void setUp(int fragmentId, DrawerLayout drawerLayout) {
+	public void setUp(int fragmentId, DrawerLayout drawerLayout, DataModel_MODULES modules) {
 		mFragmentContainerView = getActivity().findViewById(fragmentId);
 		mDrawerLayout = drawerLayout;
+		mModules = modules;
 
-		// set a custom shadow that overlays the main content when the drawer
-		// opens
 		mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
 		// set up the drawer's list view with items and click listener
-
+		ArrayAdapter<String> adapter  =  new  ArrayAdapter<String>( 
+			    getActivity(), R.layout.slide_menu_item_layout, mModules.createLabelArray());
+		
+		mDrawerListView.setAdapter(adapter);		
+		
 		ActionBar actionBar = getActionBar();
 		actionBar.setDisplayHomeAsUpEnabled(true);
 		actionBar.setHomeButtonEnabled(true);
@@ -157,7 +159,6 @@ public class ModuleListFragment extends Fragment
 	}
 
 	private void selectItem(int position) {
-		mCurrentSelectedPosition = position;
 		if (mDrawerListView != null) {
 			mDrawerListView.setItemChecked(position, true);
 		} if (mDrawerLayout != null) {
@@ -182,13 +183,7 @@ public class ModuleListFragment extends Fragment
 		super.onDetach();
 		mCallbacks = null;
 	}
-
-	@Override
-	public void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
-		outState.putInt(STATE_SELECTED_POSITION, mCurrentSelectedPosition);
-	}
-
+	
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
